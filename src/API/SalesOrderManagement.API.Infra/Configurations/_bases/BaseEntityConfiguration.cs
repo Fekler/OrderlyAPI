@@ -10,11 +10,13 @@ namespace SalesOrderManagement.API.Infra.Configurations._bases
         protected string TableName { get; set; } = string.Empty;
         public virtual void Configure(EntityTypeBuilder<T> builder)
         {
+            builder.ToTable(TableName);
+
             builder.HasKey(e => e.UUID);
 
             builder.Property(e => e.UUID)
                 .IsRequired()
-                .HasDefaultValueSql("SYS_GUID()");
+                .HasDefaultValueSql("gen_random_uuid()");
             builder.Property(e => e.Id)
                  .ValueGeneratedOnAdd();
             builder.HasIndex(e => e.Id)

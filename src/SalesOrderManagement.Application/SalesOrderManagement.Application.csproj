@@ -17,7 +17,6 @@
     <Folder Include="Dtos\" />
     <Folder Include="Validators\" />
     <Folder Include="Profiles\" />
-    <Folder Include="UseCases\" />
   </ItemGroup>
 
 </Project>
