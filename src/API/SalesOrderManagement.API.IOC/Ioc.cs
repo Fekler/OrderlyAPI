@@ -2,6 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SalesOrderManagement.API.Infra.Context;
+using SalesOrderManagement.Application.Business;
+using SalesOrderManagement.Application.Interfaces.Business;
+using SalesOrderManagement.Application.Interfaces.UseCases;
+using SalesOrderManagement.Application.UseCases;
 
 namespace SalesOrderManagement.API.IOC
 {
@@ -25,7 +29,7 @@ namespace SalesOrderManagement.API.IOC
         public static void ConfigureBusiness(this IServiceCollection services)
         {
 
-            //services.AddScoped<IUserBusiness, UserBusiness>();
+            services.AddScoped<IUserBusiness, UserBusiness>();
         }
         public static void ConfigureProfiles(this IServiceCollection services)
         {
@@ -44,7 +48,7 @@ namespace SalesOrderManagement.API.IOC
         }
         public static void ConfigureUseCases(this IServiceCollection services)
         {
-            //services.AddScoped<IAuthenticationUseCase, AuthenticationUseCase>();
+            services.AddScoped<IUserAuthentication, UserAuthentication>();
         }
         public static void ConfigureEnvironmentVariables(this IServiceCollection services, IConfiguration configuration, ref string tokenSecret, out string connectString)
         {

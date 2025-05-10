@@ -12,11 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Authentication\" />
-    <Folder Include="Business\" />
-    <Folder Include="Dtos\" />
+    <Folder Include="Business\NovaPasta\" />
     <Folder Include="Validators\" />
     <Folder Include="Profiles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
   </ItemGroup>
 
 </Project>
