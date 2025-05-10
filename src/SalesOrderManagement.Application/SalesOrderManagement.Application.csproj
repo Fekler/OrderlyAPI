@@ -6,4 +6,18 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SalesOrderManagement.Domain\SalesOrderManagement.Domain.csproj" />
+    <ProjectReference Include="..\SharedKernel\SharedKernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Authentication\" />
+    <Folder Include="Business\" />
+    <Folder Include="Dtos\" />
+    <Folder Include="Validators\" />
+    <Folder Include="Profiles\" />
+    <Folder Include="UseCases\" />
+  </ItemGroup>
+
 </Project>
