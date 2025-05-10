@@ -20,8 +20,4 @@
     <ProjectReference Include="..\SalesOrderManagement.API.IOC\SalesOrderManagement.API.IOC.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\v1\" />
-  </ItemGroup>
-
 </Project>

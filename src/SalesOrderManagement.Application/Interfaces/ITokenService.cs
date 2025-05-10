@@ -7,7 +7,6 @@ namespace SalesOrderManagement.Application.Interfaces
     public interface ITokenService
     {
         Task<AuthenticationResponse> GenerateJwtToken(UserAuthenticateJWT userAuthenticateJwt);
-        Task<string> GenerateRefreshToken(Guid userUuid);
         int GetTokenLifetimeInMinutes();
     }
 }

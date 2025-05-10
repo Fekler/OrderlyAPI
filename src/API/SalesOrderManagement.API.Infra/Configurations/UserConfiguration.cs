@@ -29,11 +29,17 @@ namespace SalesOrderManagement.API.Infra.Configurations
             builder.Property(u => u.Phone)
                 .HasMaxLength(Const.PHONE_MAX_LENGTH);
 
+            builder.HasIndex(u => u.Phone)
+                .IsUnique();
+
             builder.Property(u => u.Password)
                 .IsRequired();
 
             builder.Property(u => u.Document)
                 .HasMaxLength(Const.DOCUMENT_MAX_LENGTH);
+
+            builder.HasIndex(u => u.Document)
+                .IsUnique();
 
             builder.Property(u => u.UserRole)
                 .IsRequired()

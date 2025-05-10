@@ -24,9 +24,8 @@ namespace SalesOrderManagement.API.Controllers
             try
             {
                 var response = await _authenticationUseCase.Login(request.Email, request.Password);
-
-
                 return StatusCode((int)response.StatusCode, response.ApiReponse);
+
             }
 
             catch (Exception ex)

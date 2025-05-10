@@ -1,11 +1,17 @@
 ﻿using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SalesOrderManagement.API.Infra.Context;
+using SalesOrderManagement.API.Infra.Repositories;
 using SalesOrderManagement.Application.Business;
+using SalesOrderManagement.Application.Interfaces;
 using SalesOrderManagement.Application.Interfaces.Business;
 using SalesOrderManagement.Application.Interfaces.UseCases;
+using SalesOrderManagement.Application.Profiles;
+using SalesOrderManagement.Application.Services;
 using SalesOrderManagement.Application.UseCases;
+using SalesOrderManagement.Domain.Interfaces.Repositories;
 
 namespace SalesOrderManagement.API.IOC
 {
@@ -24,7 +30,10 @@ namespace SalesOrderManagement.API.IOC
         }
         public static void ConfigureRepositories(this IServiceCollection services)
         {
-
+            services.AddScoped<IUserRepository, UserRepository>();
+            //services.AddScoped<IOrderRepository, OrderRepository>();
+            //services.AddScoped<IProductRepository, ProductRepository>();
+            //services.AddScoped<IOrderItemRepository, OrderItemRepository>();
         }
         public static void ConfigureBusiness(this IServiceCollection services)
         {
@@ -33,12 +42,11 @@ namespace SalesOrderManagement.API.IOC
         }
         public static void ConfigureProfiles(this IServiceCollection services)
         {
-
-
+            MapsterConfiguration.Configure();
         }
         public static void ConfigureServices(this IServiceCollection services, string tokenSecret)
         {
-            //services.AddScoped<ITokenService, TokenBusiness>(); // Registra a implementação correta
+            services.AddScoped<ITokenService, TokenBusiness>(); 
 
 
         }
@@ -52,9 +60,8 @@ namespace SalesOrderManagement.API.IOC
         }
         public static void ConfigureEnvironmentVariables(this IServiceCollection services, IConfiguration configuration, ref string tokenSecret, out string connectString)
         {
-            Env.Load();
             Env.TraversePath().Load();
-            connectString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+            connectString = Environment.GetEnvironmentVariable("DATABASE_URL");
             if (string.IsNullOrEmpty(connectString))
             {
                 connectString = configuration.GetConnectionString("DefaultConnection");
@@ -68,7 +75,8 @@ namespace SalesOrderManagement.API.IOC
         }
         public static void ConfigureDBContext(this IServiceCollection services, IConfiguration configuration, string connectString)
         {
-
+            services.AddDbContext<AppDbContext>(options =>
+                  options.UseNpgsql(connectString, x=> x.MigrationsAssembly("SalesOrderManagement.API.Infra/migrations")));
         }
     }
 }

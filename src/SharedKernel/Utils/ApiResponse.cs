@@ -40,10 +40,16 @@ namespace SharedKernel.Utils
         public HttpStatusCode StatusCode { get; set; }
         public ApiResponse<T> ApiReponse { get; set; } = new ApiResponse<T>();
 
-        public Response<T> Sucess(T data, string? message = null)
+        public Response<T> Sucess(T data, string? message = null, HttpStatusCode? statusCode = null)
         {
-            StatusCode = HttpStatusCode.OK;
+            StatusCode = statusCode is null ? HttpStatusCode.OK : statusCode.Value;
             ApiReponse = new ApiResponse<T>().Sucess(data, message);
+            return this;
+        }
+        public Response<T> Failure(T? data, int? errorCode = null, string? message = null, Exception? exception = null, List<string>? errors = null, HttpStatusCode? statusCode = null)
+        {
+            StatusCode = statusCode is null ? HttpStatusCode.BadRequest : statusCode.Value;
+            ApiReponse = new ApiResponse<T>().Failure(data, errorCode, message, exception, errors);
             return this;
         }
     }
