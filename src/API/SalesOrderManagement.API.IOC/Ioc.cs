@@ -32,15 +32,17 @@ namespace SalesOrderManagement.API.IOC
         public static void ConfigureRepositories(this IServiceCollection services)
         {
             services.AddScoped<IUserRepository, UserRepository>();
-            //services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
-            //services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            services.AddScoped<IOrderItemRepository, OrderItemRepository>();
         }
 
         public static void ConfigureBusiness(this IServiceCollection services)
         {
 
             services.AddScoped<IUserBusiness, UserBusiness>();
+            services.AddScoped<IOrderBusiness, OrderBusiness>();
+            services.AddScoped<IOrderItemBusiness, OrderItemBusiness>();
             services.AddScoped<IProductBusiness, ProductBusiness>();
         }
 
@@ -51,7 +53,7 @@ namespace SalesOrderManagement.API.IOC
 
         public static void ConfigureServices(this IServiceCollection services, string tokenSecret)
         {
-            services.AddScoped<ITokenService, TokenBusiness>(); 
+            services.AddScoped<ITokenService, TokenBusiness>();
         }
 
         public static void ConfigureValidators(this IServiceCollection services)
@@ -83,7 +85,7 @@ namespace SalesOrderManagement.API.IOC
         public static void ConfigureDBContext(this IServiceCollection services, IConfiguration configuration, string connectString)
         {
             services.AddDbContextPool<AppDbContext>(options =>
-                  options.UseNpgsql(connectString, x=> x.MigrationsAssembly("SalesOrderManagement.API.Infra/migrations")));
+                  options.UseNpgsql(connectString, x => x.MigrationsAssembly("SalesOrderManagement.API.Infra")));
         }
     }
 }

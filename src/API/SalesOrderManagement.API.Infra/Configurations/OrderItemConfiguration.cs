@@ -28,6 +28,10 @@ namespace SalesOrderManagement.API.Infra.Configurations
             builder.Property(oi => oi.Quantity)
                 .IsRequired();
 
+            builder.Property(oi => oi.TotalPrice)
+                .IsRequired()
+                .HasPrecision(18, 2);
+
             builder.Property(oi => oi.UnitPrice)
                 .IsRequired()
                 .HasPrecision(18, 2);

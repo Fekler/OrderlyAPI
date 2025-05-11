@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SalesOrderManagement.Application.Dtos.Entities.Product;
 using SalesOrderManagement.Application.Interfaces.Business;
 
@@ -12,6 +13,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         private readonly IProductBusiness _productBusiness = productBusiness;
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Seller")]
         public async Task<IActionResult> CreateProduct(CreateProductDto createProductDto)
         {
             var response = await _productBusiness.Add(createProductDto);
@@ -19,6 +21,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         }
 
         [HttpGet("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> GetProductById(int id)
         {
             var response = await _productBusiness.Get(id);
@@ -26,6 +29,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         }
 
         [HttpGet("{guid:guid}")]
+        [Authorize]
         public async Task<IActionResult> GetProductByGuid(Guid guid)
         {
             var response = await _productBusiness.GetDto(guid);
@@ -33,6 +37,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllProducts()
         {
             var response = await _productBusiness.GetAll();
@@ -40,6 +45,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         }
 
         [HttpGet("category/{category}")]
+        [Authorize]
         public async Task<IActionResult> GetProductsByCategory(string category)
         {
             var response = await _productBusiness.GetAllByCategory(category);
@@ -47,6 +53,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         }
 
         [HttpPut("{guid:guid}")]
+        [Authorize(Roles = "Admin,Seller")]
         public async Task<IActionResult> UpdateProduct(Guid guid, UpdateProductDto updateProductDto)
         {
             if (guid != updateProductDto.UUID)
@@ -58,6 +65,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin,Seller")]
         public async Task<IActionResult> DeleteProductById(int id)
         {
             var response = await _productBusiness.Delete(id);
@@ -65,6 +73,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         }
 
         [HttpDelete("{guid:guid}")]
+        [Authorize(Roles = "Admin,Seller")]
         public async Task<IActionResult> DeleteProductByGuid(Guid guid)
         {
             var response = await _productBusiness.Delete(guid);

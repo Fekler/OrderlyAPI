@@ -40,7 +40,6 @@ namespace SalesOrderManagement.Application.Business
 
                 var user = createUserDto.Adapt<User>();
                 user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password); // Hash da senha antes de salvar
-                user.UUID = Guid.CreateVersion7();
 
                 await _userRepository.Add(user);
                 _logger.LogInformation($"Usuário criado com UUID: {user.UUID}");

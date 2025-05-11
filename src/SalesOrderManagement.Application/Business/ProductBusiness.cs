@@ -27,7 +27,6 @@ namespace SalesOrderManagement.Application.Business
             try
             {
                 var product = createProductDto.Adapt<Product>();
-                product.UUID = Guid.CreateVersion7();
                 await _productRepository.Add(product);
                 _logger.LogInformation($"Produto criado com UUID: {product.UUID}");
                 return new Response<Guid>().Sucess(product.UUID, message: Const.CREATE_SUCCESS, statusCode: HttpStatusCode.Created);
