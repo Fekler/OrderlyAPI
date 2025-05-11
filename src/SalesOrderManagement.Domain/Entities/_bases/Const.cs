@@ -15,14 +15,12 @@
 
 
         #region Messages
-        public const string MESSAGE_INVALID_LOGIN = "Invalid email or password";
-        public const string MESSAGE_UNEXPECTED_ERROR = "An unexpected error occurred";
+        public const string SYSTEM_SUCCESS = "System success";
+        public const string CREATE_SUCCESS = "Create success";
+        public const string UPDATE_SUCCESS = "Update success";
+        public const string DELETE_SUCCESS = "Delete success";
 
-        public const string MESSAGE_USER_NOT_FOUND = "User not found";
-        public const string MESSAGE_USER_ALREADY_EXISTS = "User already exists";
-        public const string MESSAGE_USER_NOT_AUTHORIZED = "User not authorized";
-        public const string MESSAGE_USER_NOT_ACTIVE = "User not active";
-
+        public const string MESSAGE_USER_FOUND = "User found";
         public const string MESSAGE_LOGIN_SUCCESS = "Login successful";
         #endregion
     }

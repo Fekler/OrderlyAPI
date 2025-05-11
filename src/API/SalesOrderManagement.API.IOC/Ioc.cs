@@ -28,36 +28,42 @@ namespace SalesOrderManagement.API.IOC
             services.ConfigureUseCases();
             services.ConfigureServices(tokenSecret);
         }
+
         public static void ConfigureRepositories(this IServiceCollection services)
         {
             services.AddScoped<IUserRepository, UserRepository>();
             //services.AddScoped<IOrderRepository, OrderRepository>();
-            //services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
             //services.AddScoped<IOrderItemRepository, OrderItemRepository>();
         }
+
         public static void ConfigureBusiness(this IServiceCollection services)
         {
 
             services.AddScoped<IUserBusiness, UserBusiness>();
+            services.AddScoped<IProductBusiness, ProductBusiness>();
         }
+
         public static void ConfigureProfiles(this IServiceCollection services)
         {
             MapsterConfiguration.Configure();
         }
+
         public static void ConfigureServices(this IServiceCollection services, string tokenSecret)
         {
             services.AddScoped<ITokenService, TokenBusiness>(); 
-
-
         }
+
         public static void ConfigureValidators(this IServiceCollection services)
         {
             //services.AddSingleton<IValidatorProvider, ValidatorFactory>();
         }
+
         public static void ConfigureUseCases(this IServiceCollection services)
         {
             services.AddScoped<IUserAuthentication, UserAuthentication>();
         }
+
         public static void ConfigureEnvironmentVariables(this IServiceCollection services, IConfiguration configuration, ref string tokenSecret, out string connectString)
         {
             Env.TraversePath().Load();
@@ -73,9 +79,10 @@ namespace SalesOrderManagement.API.IOC
             }
             string jwtSecret = tokenSecret;
         }
+
         public static void ConfigureDBContext(this IServiceCollection services, IConfiguration configuration, string connectString)
         {
-            services.AddDbContext<AppDbContext>(options =>
+            services.AddDbContextPool<AppDbContext>(options =>
                   options.UseNpgsql(connectString, x=> x.MigrationsAssembly("SalesOrderManagement.API.Infra/migrations")));
         }
     }

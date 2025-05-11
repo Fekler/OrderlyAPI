@@ -9,6 +9,7 @@ using SalesOrderManagement.Domain.Entities._bases;
 using SalesOrderManagement.Application.Interfaces;
 using SalesOrderManagement.Application.Interfaces.Business;
 using SalesOrderManagement.Application.Interfaces.UseCases;
+using SalesOrderManagement.Domain.Errors;
 
 namespace SalesOrderManagement.Application.UseCases
 {
@@ -28,7 +29,7 @@ namespace SalesOrderManagement.Application.UseCases
                     Success = false,
                     Data = null,
                     ErrorCode = (int)HttpStatusCode.Unauthorized,
-                    Message = Const.MESSAGE_INVALID_LOGIN,
+                    Message = Error.INVALID_EMAIL_OR_PASSWORD,
                 }
             };
 
@@ -64,7 +65,7 @@ namespace SalesOrderManagement.Application.UseCases
                 response.StatusCode = HttpStatusCode.InternalServerError;
                 response.ApiReponse.Success = false;
                 response.ApiReponse.ErrorCode = (int)HttpStatusCode.InternalServerError;
-                response.ApiReponse.Message = Const.MESSAGE_UNEXPECTED_ERROR + " during login.";
+                response.ApiReponse.Message = Error.UNEXPECTED_ERROR + " during login.";
             }
 
             return response;
@@ -86,7 +87,7 @@ namespace SalesOrderManagement.Application.UseCases
                 UserUuid = user.UUID,
                 UserEmail = user.Email,
                 UserName = user.FullName,
-                UserRole = nameof(user.UserRole),
+                UserRole = user.UserRole.ToString(),
             };
 
             var accessTokenResult = await _tokenService.GenerateJwtToken(userToken);

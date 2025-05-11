@@ -6,14 +6,15 @@ using SalesOrderManagement.Application.Interfaces.Business;
 namespace SalesOrderManagement.API.Controllers.v1
 {
     [ApiController]
-    [Route("api/users")]
     [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+
     public class UserController(IUserBusiness userBusiness) : ControllerBase
     {
         private readonly IUserBusiness _userBusiness = userBusiness;
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Add([FromBody] CreateUserDto createUserDto)
         {
             if (!ModelState.IsValid)

@@ -1,5 +1,5 @@
 ﻿using SalesOrderManagement.Application.Dtos.Entities.User;
-using SalesOrderManagement.Application.Interfaces._bases;
+using SalesOrderManagement.Application.Interfaces.Business._bases;
 using SalesOrderManagement.Domain.Entities;
 using SharedKernel.Utils;
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SalesOrderManagement.API.Infra.Configurations;
 using SalesOrderManagement.Domain.Entities;
 
@@ -27,6 +29,23 @@ namespace SalesOrderManagement.API.Infra.Context
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
 
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                base.OnConfiguring(optionsBuilder);
+
+                // Usado dessa maneira somente para usar os migrations.
+                Env.TraversePath().Load();
+                
+                string connectString = Environment.GetEnvironmentVariable("DATABASE_URL");
+                optionsBuilder.UseNpgsql(connectString,
+                    npgsqlOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name);
+                    });
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SalesOrderManagement.Application.Dtos.Entities.User;
 using SalesOrderManagement.Application.Interfaces.Business;
 using SalesOrderManagement.Domain.Entities;
+using SalesOrderManagement.Domain.Entities._bases;
 using SalesOrderManagement.Domain.Interfaces.Repositories;
 using SharedKernel.Utils;
 using System.Net;
@@ -22,7 +23,7 @@ namespace SalesOrderManagement.Application.Business
                 var existingUserByEmail = await _userRepository.GetByEmail(createUserDto.Email);
                 if (existingUserByEmail != null)
                 {
-                    return new Response<Guid>().Failure(default, message: "Já existe um usuário cadastrado com este e-mail.", statusCode: HttpStatusCode.Conflict);
+                    return new Response<Guid>().Failure(default, message: Const.CREATE_SUCCESS, statusCode: HttpStatusCode.Conflict);
                 }
 
                 var existingUserByDocument = await _userRepository.GetByDocument(createUserDto.Document);
@@ -39,7 +40,7 @@ namespace SalesOrderManagement.Application.Business
 
                 var user = createUserDto.Adapt<User>();
                 user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password); // Hash da senha antes de salvar
-                user.UUID = Guid.CreateVersion7(); 
+                user.UUID = Guid.CreateVersion7();
 
                 await _userRepository.Add(user);
                 _logger.LogInformation($"Usuário criado com UUID: {user.UUID}");
@@ -187,7 +188,7 @@ namespace SalesOrderManagement.Application.Business
                 {
                     return new Response<User>().Failure(default, message: "Usuário não encontrado com este e-mail.", statusCode: HttpStatusCode.NotFound);
                 }
-                return new Response<User>().Sucess(user, statusCode: HttpStatusCode.OK);
+                return new Response<User>().Sucess(user, message: Const.MESSAGE_USER_FOUND, statusCode: HttpStatusCode.OK);
             }
             catch (Exception ex)
             {

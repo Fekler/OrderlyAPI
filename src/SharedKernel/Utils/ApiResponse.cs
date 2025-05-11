@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Reflection.Metadata;
 
 namespace SharedKernel.Utils
 {
@@ -42,6 +43,7 @@ namespace SharedKernel.Utils
 
         public Response<T> Sucess(T data, string? message = null, HttpStatusCode? statusCode = null)
         {
+            message = message is not null ? message : "System success";
             StatusCode = statusCode is null ? HttpStatusCode.OK : statusCode.Value;
             ApiReponse = new ApiResponse<T>().Sucess(data, message);
             return this;

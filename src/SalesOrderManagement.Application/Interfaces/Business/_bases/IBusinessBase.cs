@@ -1,7 +1,7 @@
 ﻿using SalesOrderManagement.Domain.Entities._bases;
 using SharedKernel.Utils;
 
-namespace SalesOrderManagement.Application.Interfaces._bases
+namespace SalesOrderManagement.Application.Interfaces.Business._bases
 {
     public interface IBusinessBase<T, TCreateDto, TUpdateDto, TGetDto> where T : EntityBase
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using DotNetEnv;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SalesOrderManagement.Application.Authentication;
 using SalesOrderManagement.Application.Dtos.Auth;
@@ -17,8 +18,9 @@ namespace SalesOrderManagement.Application.Services
         public TokenBusiness(IConfiguration configuration)
         {
             _configuration = configuration;
+            //Env.TraversePath().Load();
             string getToken = Environment.GetEnvironmentVariable("TOKEN_JWT_SECRET");
-            if (string.IsNullOrEmpty(_jwtKey))
+            if (string.IsNullOrEmpty(getToken))
             {
                 getToken = configuration["Jwt:Key"];
             }
