@@ -56,9 +56,10 @@ jobs:
     - name: Push da imagem Docker para GHCR
       run: docker push ghcr.io/${{ github.repository }}/salesordermanagement-api:latest
 
-  deploy:
+deploy:
     needs: dockerize
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
 
     steps:
     - name: Checkout do código
@@ -69,9 +70,13 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
+    - name: Obter nome do repositório em lowercase
+      id: repo_name
+      run: echo "REPO_LOWERCASE=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
     - name: Deploy para a VM via SSH
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }}<< EOF
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << EOF
           echo "Iniciando deploy..."
           cd /var/api/salesordermanagement || mkdir -p /var/api/salesordermanagement
           cd /var/api/salesordermanagement
@@ -84,15 +89,13 @@ jobs:
           docker rm salesordermanagement-api || true
 
           echo "Puxando a imagem mais recente do GHCR..."
-          docker pull ghcr.io/${{ github.repository }}/salesordermanagement-api:latest
+          docker pull ghcr.io/${{ steps.repo_name.outputs.REPO_LOWERCASE }}/salesordermanagement-api:latest
 
           echo "Executando o novo container..."
           docker run -d --name salesordermanagement-api -p 9000:8080 \
             -e ASPNETCORE_ENVIRONMENT=Production \
             -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
             -e TOKEN_JWT_SECRET="${{ secrets.TOKEN_JWT_SECRET }}" \
-            ghcr.io/${{ github.repository }}/salesordermanagement-api:latest
+            ghcr.io/${{ steps.repo_name.outputs.REPO_LOWERCASE }}/salesordermanagement-api:latest
           echo "Deploy concluído!"
         EOF
-
-        
