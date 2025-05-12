@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SalesOrderManagement.API.Infra\SalesOrderManagement.API.Infra.csproj" />
+  </ItemGroup>
+
 </Project>
