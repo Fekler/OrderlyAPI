@@ -2,9 +2,9 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "**" ]
+    branches: ["**"]
 
 jobs:
   build:
@@ -15,6 +15,7 @@ jobs:
       - name: Configurar o .NET
         uses: actions/setup-dotnet@v4
         with:
+
           dotnet-version: '9.0.x'
       - name: Restaurar dependências
         run: dotnet restore ./src/API/SalesOrderManagement.API/SalesOrderManagement.API.csproj
@@ -35,12 +36,12 @@ jobs:
       - name: Configurar o .NET
         uses: actions/setup-dotnet@v4
         with:
+
           dotnet-version: '9.0.x'
       - name: Login no GHCR
         run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
       - name: Build e Tag da imagem Docker
         run: |
-          cd ./src/API/SalesOrderManagement.API
           docker build -t ${{ env.IMAGE_NAME }} .
       - name: Push da imagem Docker para GHCR
         run: docker push ${{ env.IMAGE_NAME }}
