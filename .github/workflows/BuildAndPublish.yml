@@ -1,98 +1,84 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "**" ]
+    branches: ["**"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout do código
-      uses: actions/checkout@v4
-
-    - name: Configurar o .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '9.0.x'
-
-    - name: Restaurar dependências
-      run: dotnet restore ./src/API/SalesOrderManagement.API/SalesOrderManagement.API.csproj
-
-    - name: Build
-      run: dotnet build --no-restore --configuration Release ./src/API/SalesOrderManagement.API/SalesOrderManagement.API.csproj
-
-    - name: Testar
-      run: dotnet test --no-build --configuration Release --verbosity normal ./SalesOrderManagement.sln
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Configurar o .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+      - name: Restaurar dependências
+        run: dotnet restore ./src/API/SalesOrderManagement.API/SalesOrderManagement.API.csproj
+      - name: Build
+        run: dotnet build --no-restore --configuration Release ./src/API/SalesOrderManagement.API/SalesOrderManagement.API.csproj
+      - name: Testar
+        run: dotnet test --no-build --configuration Release --verbosity normal ./SalesOrderManagement.sln
 
   dockerize:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
-
+    env:
+      IMAGE_NAME: ghcr.io/fekler/sales-order-management/backend-api:latest
     steps:
-    - name: Checkout do código
-      uses: actions/checkout@v4
-
-    - name: Configurar o .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '9.0.x'
-
-    - name: Login no GHCR
-      run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
-
-    - name: Build e Tag da imagem Docker
-      run: |
-        cd ./src/API/SalesOrderManagement.API
-        docker build -t ghcr.io/${{ github.repository }}/salesordermanagement-api:latest .
-
-    - name: Push da imagem Docker para GHCR
-      run: docker push ghcr.io/${{ github.repository }}/salesordermanagement-api:latest
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Configurar o .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+      - name: Login no GHCR
+        run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
+      - name: Build e Tag da imagem Docker
+        run: |
+          docker build -t ${{ env.IMAGE_NAME }} .
+      - name: Push da imagem Docker para GHCR
+        run: docker push ${{ env.IMAGE_NAME }}
 
   deploy:
     needs: dockerize
     runs-on: ubuntu-latest
-
+    if: github.ref == 'refs/heads/master'
+    env:
+      IMAGE_NAME: ghcr.io/fekler/sales-order-management/backend-api:latest
     steps:
-    - name: Checkout do código
-      uses: actions/checkout@v3
+      - name: Checkout do código
+        uses: actions/checkout@v3
+      - name: Configurar SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - name: Deploy para a VM via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << EOF
+            echo "Iniciando deploy..."
+            cd /var/api/salesordermanagement || mkdir -p /var/api/salesordermanagement
+            cd /var/api/salesordermanagement
 
-    - name: Configurar SSH
-      uses: webfactory/ssh-agent@v0.5.4
-      with:
-        ssh-private-key: ${{ secrets.SSH_KEY }}
+            echo "Fazendo login no GHCR..."
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
 
-    - name: Deploy para a VM via SSH
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }}<< EOF
-          echo "Iniciando deploy..."
-          cd /var/api/salesordermanagement || mkdir -p /var/api/salesordermanagement
-          cd /var/api/salesordermanagement
+            echo "Parando e removendo container antigo "
+            docker stop salesordermanagement-api || true
+            docker rm salesordermanagement-api || true
 
-          echo "Fazendo login no GHCR..."
-          docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
+            echo "Puxando a imagem mais recente do GHCR..."
+            docker pull ${{ env.IMAGE_NAME }}
 
-          echo "Parando e removendo container antigo "
-          docker stop salesordermanagement-api || true
-          docker rm salesordermanagement-api || true
-
-          echo "Puxando a imagem mais recente do GHCR..."
-          docker pull ghcr.io/${{ github.repository }}/salesordermanagement-api:latest
-
-          echo "Executando o novo container..."
-          docker run -d --name salesordermanagement-api -p 9000:8080 \
-            -e ASPNETCORE_ENVIRONMENT=Production \
-            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-            -e TOKEN_JWT_SECRET="${{ secrets.TOKEN_JWT_SECRET }}" \
-            ghcr.io/${{ github.repository }}/salesordermanagement-api:latest
-          echo "Deploy concluído!"
-        EOF
-
-        
+            echo "Executando o novo container..."
+            docker run -d --name salesordermanagement-api -p 9000:8080 \
+              -e ASPNETCORE_ENVIRONMENT=Production \
+              -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+              -e TOKEN_JWT_SECRET="${{ secrets.TOKEN_JWT_SECRET }}" \
+              ${{ env.IMAGE_NAME }}
+            echo "Deploy concluído!"
+          EOF
