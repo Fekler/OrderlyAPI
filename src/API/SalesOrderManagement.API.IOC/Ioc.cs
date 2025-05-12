@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SalesOrderManagement.API.Infra.Context;
 using SalesOrderManagement.API.Infra.Repositories;
 using SalesOrderManagement.Application.Business;
+using SalesOrderManagement.Application.Dtos.Dashboard;
 using SalesOrderManagement.Application.Interfaces;
 using SalesOrderManagement.Application.Interfaces.Business;
 using SalesOrderManagement.Application.Interfaces.UseCases;
@@ -64,6 +65,8 @@ namespace SalesOrderManagement.API.IOC
         public static void ConfigureUseCases(this IServiceCollection services)
         {
             services.AddScoped<IUserAuthentication, UserAuthentication>();
+            services.AddScoped<IOrderProcessing, OrderProcessing>();
+            services.AddScoped<IDashboard, Dashboard>();
         }
 
         public static void ConfigureEnvironmentVariables(this IServiceCollection services, IConfiguration configuration, ref string tokenSecret, out string connectString)

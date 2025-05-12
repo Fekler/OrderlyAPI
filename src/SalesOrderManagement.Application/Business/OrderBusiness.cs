@@ -25,8 +25,6 @@ namespace SalesOrderManagement.Application.Business
                 order.UUID = Guid.NewGuid();
                 order.TotalAmount = 0; 
 
-
-
                 await _orderRepository.Add(order);
                 _logger.LogInformation($"Pedido criado com UUID: {order.UUID} e número: {order.OrderNumber}");
                 return new Response<Guid>().Sucess(order.UUID, message: Const.CREATE_SUCCESS, statusCode: HttpStatusCode.Created);
