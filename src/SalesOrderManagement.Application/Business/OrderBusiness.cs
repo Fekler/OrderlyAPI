@@ -21,9 +21,7 @@ namespace SalesOrderManagement.Application.Business
             try
             {
                 var order = createOrderDto.Adapt<Order>();
-                order.OrderNumber = GenerateOrderNumber();
-                order.UUID = Guid.NewGuid();
-                order.TotalAmount = 0; 
+                order.Validate();
 
                 await _orderRepository.Add(order);
                 _logger.LogInformation($"Pedido criado com UUID: {order.UUID} e número: {order.OrderNumber}");
@@ -171,6 +169,7 @@ namespace SalesOrderManagement.Application.Business
 
                 updateOrderDto.Adapt(existingOrder);
                 existingOrder.UpdateAt = DateTime.UtcNow;
+                existingOrder.Validate();
 
                 var result = await _orderRepository.Update(existingOrder);
                 if (result)
@@ -274,9 +273,5 @@ namespace SalesOrderManagement.Application.Business
             }
         }
 
-        private static string GenerateOrderNumber()
-        {
-            return $"ORD-{DateTime.Now:yyyyMMddHHmmss}-{Guid.CreateVersion7().ToString()[..4].ToUpper()}";
-        }
     }
 }

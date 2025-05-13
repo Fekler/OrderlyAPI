@@ -83,5 +83,6 @@ namespace SalesOrderManagement.API.Controllers.v1
             var response = await _userBusiness.ChangePasswordAsync(changePasswordDto);
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }
+
     }
 }
