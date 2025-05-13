@@ -20,7 +20,7 @@ namespace SalesOrderManagement.Domain.Entities._bases
             InitializeEntity(uuid, createAt, id);
         }
 
-        private void InitializeEntity(Guid? uuid, DateTime? createAt, int? id)
+        protected virtual void InitializeEntity(Guid? uuid, DateTime? createAt, int? id)
         {
             if (!id.HasValue)
             {
@@ -38,12 +38,12 @@ namespace SalesOrderManagement.Domain.Entities._bases
 
         public virtual void Validate()
         {
-            InitializeEntity(this.UUID, this.CreateAt, this.Id);
+            //InitializeEntity(this.UUID, this.CreateAt, this.Id);
 
             RuleValidator.Build()
                 .When(Id < 0, Error.INVALID_ID)
                 .When(UUID == Guid.Empty, Error.INVALID_UUID)
-                .When(Id > 0 && CreateAt == default, "CreateAt must be a valid date.")
+                .When(Id > 0 && CreateAt == default, Error.INVALID_DATE)
                 .ThrowExceptionIfExists();
         }
     }

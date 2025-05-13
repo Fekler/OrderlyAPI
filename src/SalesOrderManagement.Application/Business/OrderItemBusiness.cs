@@ -29,7 +29,8 @@ namespace SalesOrderManagement.Application.Business
 
                 var orderItem = createOrderItemDto.Adapt<OrderItem>();
                 orderItem.UnitPrice = product.Price; 
-                orderItem.TotalPrice = orderItem.UnitPrice * orderItem.Quantity;
+                orderItem.CalculateTotalPrice();
+                orderItem.Validate();
 
                 await _orderItemRepository.Add(orderItem);
                 _logger.LogInformation($"Item de pedido criado com UUID: {orderItem.UUID} para o produto: {product.Name}");

@@ -6,6 +6,7 @@
         public const string INVALID_UUID = "Invalid UUID.";
         public const string INVALID_NAME = "Invalid Name.";
         public const string INVALID_DESCRIPTION = "Invalid Description.";
+        public const string INVALID_DATE = "Invalid Date.";
         public const string INVALID_PRICE = "Invalid Price.";
         public const string INVALID_EMAIL = "Invalid E-mail.";
         public const string INVALID_PHONE = "Invalid Phone.";
