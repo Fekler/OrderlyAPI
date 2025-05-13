@@ -18,11 +18,11 @@ jobs:
 
           dotnet-version: '9.0.x'
       - name: Restaurar dependências
-        run: dotnet restore ./src/API/SalesOrderManagement.API/SalesOrderManagement.API.csproj
+        run: dotnet restore SalesOrderManagement.sln
       - name: Build
-        run: dotnet build --no-restore --configuration Release ./src/API/SalesOrderManagement.API/SalesOrderManagement.API.csproj
+        run: dotnet build --no-restore --configuration Release SalesOrderManagement.sln
       - name: Testar
-        run: dotnet test --no-build --configuration Release --verbosity normal ./SalesOrderManagement.sln
+        run: dotnet test --no-build --configuration Release --verbosity normal ./src/SalesOrderManagement.Test/SalesOrderManagement.Test.csproj
 
   dockerize:
     needs: build
