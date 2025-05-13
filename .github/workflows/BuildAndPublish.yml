@@ -15,7 +15,8 @@ jobs:
       - name: Configurar o .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0.x"
+
+          dotnet-version: '9.0.x'
       - name: Restaurar dependências
         run: dotnet restore ./src/API/SalesOrderManagement.API/SalesOrderManagement.API.csproj
       - name: Build
@@ -35,7 +36,8 @@ jobs:
       - name: Configurar o .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0.x"
+
+          dotnet-version: '9.0.x'
       - name: Login no GHCR
         run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
       - name: Build e Tag da imagem Docker
