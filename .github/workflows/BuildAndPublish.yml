@@ -22,7 +22,7 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release ./src/API/SalesOrderManagement.API/SalesOrderManagement.API.csproj
       - name: Testar
-        run: dotnet test --no-build --configuration Release --verbosity normal ./SalesOrderManagement.sln
+        run: dotnet test --no-build --configuration Release --verbosity normal ./src/SalesOrderManagement.Test/SalesOrderManagement.Test.csproj
 
   dockerize:
     needs: build
