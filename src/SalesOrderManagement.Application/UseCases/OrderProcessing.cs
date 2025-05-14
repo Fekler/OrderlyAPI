@@ -56,6 +56,10 @@ namespace SalesOrderManagement.Application.UseCases
                     }
                     var product = productResult.ApiReponse.Data;
 
+                    if(!itemDto.OrderId.HasValue || itemDto.OrderId.Value != orderUuid)
+                    {
+                        itemDto.OrderId = orderUuid;
+                    }
                     var createOrderItemResult = await _orderItemBusiness.Add(itemDto);
                     if (!createOrderItemResult.ApiReponse.Success)
                     {

@@ -8,8 +8,7 @@ namespace SalesOrderManagement.Application.Dtos.Entities.OrderItem
         public Guid ProductId { get; set; }
 
 
-        [Required(ErrorMessage = $"Order {Error.INVALID_UUID} ")]
-        public Guid OrderId { get; set; }
+        public Guid? OrderId { get; set; }
 
         [Required(ErrorMessage = Error.INVALID_QUANTITY)]
         [Range(1, int.MaxValue, ErrorMessage = "A quantidade deve ser maior que zero.")]
