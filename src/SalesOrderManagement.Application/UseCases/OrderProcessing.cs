@@ -56,7 +56,7 @@ namespace SalesOrderManagement.Application.UseCases
                     }
                     var product = productResult.ApiReponse.Data;
 
-                    if(!itemDto.OrderId.HasValue || itemDto.OrderId.Value != orderUuid)
+                    if (!itemDto.OrderId.HasValue || itemDto.OrderId.Value != orderUuid)
                     {
                         itemDto.OrderId = orderUuid;
                     }
@@ -104,17 +104,13 @@ namespace SalesOrderManagement.Application.UseCases
                     return new Response<IEnumerable<OrderDto>>().Failure(default, message: "Usuário não encontrado.", statusCode: HttpStatusCode.NotFound);
                 }
 
-                switch (user.ApiReponse.Data.UserRole)
+                return user.ApiReponse.Data.UserRole switch
                 {
-                    case UserRole.Admin:
-                        return await _orderBusiness.GetAll();
-                    case UserRole.Seller:
-                        return await _orderBusiness.GetAll();
-                    case UserRole.Client:
-                        return await _orderBusiness.GetOrdersByUserId(userUuid);
-                    default:
-                        return new Response<IEnumerable<OrderDto>>().Failure(default, message: "Função de usuário inválida.", statusCode: HttpStatusCode.BadRequest);
-                }
+                    UserRole.Admin => await _orderBusiness.GetAll(),
+                    UserRole.Seller => await _orderBusiness.GetAll(),
+                    UserRole.Client => await _orderBusiness.GetOrdersByUserId(userUuid),
+                    _ => new Response<IEnumerable<OrderDto>>().Failure(default, message: "Função de usuário inválida.", statusCode: HttpStatusCode.BadRequest),
+                };
             }
             catch (Exception)
             {
@@ -147,6 +143,21 @@ namespace SalesOrderManagement.Application.UseCases
                 order.ActionedByUserUuid = user.UUID;
                 order.ActionedAt = DateTime.UtcNow;
                 await _orderBusiness.Update(order.Adapt<UpdateOrderDto>());
+                if (orderStatus == OrderStatus.Approved)
+                {
+                    foreach (var item in order.OrderItems)
+                    {
+                        var orderItemResult = await _orderItemBusiness.GetEntity(item.UUID);
+                        if (!orderItemResult.ApiReponse.Success || orderItemResult.ApiReponse.Data == null)
+                        {
+                            return new Response<bool>().Failure(false, message: "Item do pedido não encontrado.", statusCode: HttpStatusCode.NotFound);
+                        }
+                        var orderItem = orderItemResult.ApiReponse.Data;
+                            orderItem.Quantity -= item.Quantity;
+
+                        await _orderItemBusiness.Update(orderItem.Adapt<UpdateOrderItemDto>());
+                    }
+                }
                 return new Response<bool>().Sucess(true, message: "Status do pedido atualizado com sucesso.", statusCode: HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -155,5 +166,5 @@ namespace SalesOrderManagement.Application.UseCases
             }
         }
     }
-    
+
 }
