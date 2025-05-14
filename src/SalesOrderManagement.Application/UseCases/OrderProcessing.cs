@@ -3,22 +3,26 @@ using SalesOrderManagement.Application.Dtos.Entities.Order;
 using SalesOrderManagement.Application.Dtos.Entities.OrderItem;
 using SalesOrderManagement.Application.Interfaces.Business;
 using SalesOrderManagement.Application.Interfaces.UseCases;
+using SalesOrderManagement.Domain.Interfaces.Repositories;
 using SharedKernel.Utils;
 using System.Net;
+using static SalesOrderManagement.Domain.Entities._bases.Enums;
 
-namespace SalesOrderManagement.Application.Dtos.Dashboard
+namespace SalesOrderManagement.Application.UseCases
 {
     public class OrderProcessing : IOrderProcessing
     {
         private readonly IOrderBusiness _orderBusiness;
         private readonly IProductBusiness _productBusiness;
         private readonly IOrderItemBusiness _orderItemBusiness;
+        private readonly IUserBusiness _userBusiness;
 
-        public OrderProcessing(IOrderBusiness orderBusiness, IProductBusiness productBusiness, IOrderItemBusiness orderItemBusiness)
+        public OrderProcessing(IOrderBusiness orderBusiness, IProductBusiness productBusiness, IOrderItemBusiness orderItemBusiness, IUserBusiness userBusiness)
         {
             _orderBusiness = orderBusiness;
             _productBusiness = productBusiness;
             _orderItemBusiness = orderItemBusiness;
+            _userBusiness = userBusiness;
         }
 
         public async Task<Response<Guid>> CreateOrder(CreateOrderDto createOrderDto)
@@ -84,5 +88,70 @@ namespace SalesOrderManagement.Application.Dtos.Dashboard
                 return new Response<Guid>().Failure(default, message: $"Erro ao processar a criação do pedido: {ex.Message}", statusCode: HttpStatusCode.InternalServerError);
             }
         }
+
+        public async Task<Response<IEnumerable<OrderDto>>> GetAllByLoggedUser(Guid userUuid)
+        {
+
+            try
+            {
+                var user = await _userBusiness.GetEntity(userUuid);
+                if (!user.ApiReponse.Success || user.ApiReponse.Data == null)
+                {
+                    return new Response<IEnumerable<OrderDto>>().Failure(default, message: "Usuário não encontrado.", statusCode: HttpStatusCode.NotFound);
+                }
+
+                switch (user.ApiReponse.Data.UserRole)
+                {
+                    case UserRole.Admin:
+                        return await _orderBusiness.GetAll();
+                    case UserRole.Seller:
+                        return await _orderBusiness.GetAll();
+                    case UserRole.Client:
+                        var orders = await _orderBusiness.GetOrdersByUserId(userUuid);
+                        var orderDtos = orders.Adapt<IEnumerable<OrderDto>>();
+                        return new Response<IEnumerable<OrderDto>>().Sucess(orderDtos, statusCode: HttpStatusCode.OK);
+                    default:
+                        return new Response<IEnumerable<OrderDto>>().Failure(default, message: "Função de usuário inválida.", statusCode: HttpStatusCode.BadRequest);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<Response<bool>> ActionOrder(Guid orderUuid, Guid userUuid, OrderStatus orderStatus)
+        {
+            try
+            {
+                var orderResult = await _orderBusiness.GetEntity(orderUuid);
+                if (!orderResult.ApiReponse.Success || orderResult.ApiReponse.Data == null)
+                {
+                    return new Response<bool>().Failure(false, message: "Pedido não encontrado.", statusCode: HttpStatusCode.NotFound);
+                }
+                var order = orderResult.ApiReponse.Data;
+                var userResult = await _userBusiness.GetEntity(userUuid);
+                if (!userResult.ApiReponse.Success || userResult.ApiReponse.Data == null)
+                {
+                    return new Response<bool>().Failure(false, message: "Usuário não encontrado.", statusCode: HttpStatusCode.NotFound);
+                }
+                var user = userResult.ApiReponse.Data;
+                if (user.UserRole != UserRole.Admin && user.UserRole != UserRole.Seller)
+                {
+                    return new Response<bool>().Failure(false, message: "Apenas administradores e vendedores podem alterar o status do pedido.", statusCode: HttpStatusCode.Forbidden);
+                }
+                order.Status = orderStatus;
+                order.ActionedByUserUuid = user.UUID;
+                order.ActionedAt = DateTime.UtcNow;
+                await _orderBusiness.Update(order.Adapt<UpdateOrderDto>());
+                return new Response<bool>().Sucess(true, message: "Status do pedido atualizado com sucesso.", statusCode: HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return new Response<bool>().Failure(false, message: $"Erro ao processar a ação no pedido: {ex.Message}", statusCode: HttpStatusCode.InternalServerError);
+            }
+        }
     }
+    
 }

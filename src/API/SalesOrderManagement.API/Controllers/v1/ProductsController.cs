@@ -56,19 +56,8 @@ namespace SalesOrderManagement.API.Controllers.v1
         [Authorize(Roles = "Admin,Seller")]
         public async Task<IActionResult> UpdateProduct(Guid guid, UpdateProductDto updateProductDto)
         {
-            if (guid != updateProductDto.UUID)
-            {
-                return BadRequest();
-            }
-            var response = await _productBusiness.Update(updateProductDto);
-            return StatusCode((int)response.StatusCode, response.ApiReponse);
-        }
 
-        [HttpDelete("{id:int}")]
-        [Authorize(Roles = "Admin,Seller")]
-        public async Task<IActionResult> DeleteProductById(int id)
-        {
-            var response = await _productBusiness.Delete(id);
+            var response = await _productBusiness.Update(updateProductDto);
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }
 

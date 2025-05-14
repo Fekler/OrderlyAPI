@@ -111,6 +111,7 @@ namespace SalesOrderManagement.Application.Business
             {
                 var orders = await _orderRepository.GetAllWithItemsAsync();
                 var orderDtos = orders.Adapt<IEnumerable<OrderDto>>();
+                orderDtos = orderDtos.OrderByDescending(o => o.Status == Enums.OrderStatus.Pending).ThenBy(o=> o.OrderDate);
                 return new Response<IEnumerable<OrderDto>>().Sucess(orderDtos, statusCode: HttpStatusCode.OK);
             }
             catch (Exception ex)
