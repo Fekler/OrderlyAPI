@@ -107,9 +107,7 @@ namespace SalesOrderManagement.Application.UseCases
                     case UserRole.Seller:
                         return await _orderBusiness.GetAll();
                     case UserRole.Client:
-                        var orders = await _orderBusiness.GetOrdersByUserId(userUuid);
-                        var orderDtos = orders.Adapt<IEnumerable<OrderDto>>();
-                        return new Response<IEnumerable<OrderDto>>().Sucess(orderDtos, statusCode: HttpStatusCode.OK);
+                        return await _orderBusiness.GetOrdersByUserId(userUuid);
                     default:
                         return new Response<IEnumerable<OrderDto>>().Failure(default, message: "Função de usuário inválida.", statusCode: HttpStatusCode.BadRequest);
                 }
