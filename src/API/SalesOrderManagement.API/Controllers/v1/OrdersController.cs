@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SalesOrderManagement.Application.Dtos.Entities.Order;
 using SalesOrderManagement.Application.Interfaces.Business;
-using SalesOrderManagement.Application.UseCases;
+using SalesOrderManagement.Application.Interfaces.UseCases;
 using SalesOrderManagement.Domain.Errors;
 using System.Security.Claims;
 using static SalesOrderManagement.Domain.Entities._bases.Enums;
@@ -12,10 +12,10 @@ namespace SalesOrderManagement.API.Controllers.v1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class OrdersController(IOrderBusiness orderBusiness, OrderProcessing orderProcessing) : ControllerBase
+    public class OrdersController(IOrderBusiness orderBusiness, IOrderProcessing orderProcessing) : ControllerBase
     {
         private readonly IOrderBusiness _orderBusiness = orderBusiness;
-        private readonly OrderProcessing _orderProcessing = orderProcessing;
+        private readonly IOrderProcessing _orderProcessing = orderProcessing;
 
         [HttpPost]
         [Authorize(Roles = "Admin,Client")]
@@ -56,7 +56,7 @@ namespace SalesOrderManagement.API.Controllers.v1
             {
                 return Unauthorized(Error.UNAUTHORIZED);
             }
-            var response = await _orderBusiness.GetOrdersByUserId(userId);
+            var response = await _orderProcessing.GetAllByLoggedUser(userId);
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }
 
