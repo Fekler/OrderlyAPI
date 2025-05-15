@@ -130,6 +130,10 @@ namespace SalesOrderManagement.Application.UseCases
                 }
                 var order = orderResult.ApiReponse.Data;
                 var userResult = await _userBusiness.GetEntity(userUuid);
+                if(orderResult.ApiReponse.Data.Status == OrderStatus.Approved)
+                {
+                    return new Response<bool>().Failure(false, message: "Pedido já foi aprovado.", statusCode: HttpStatusCode.BadRequest);
+                }
                 if (!userResult.ApiReponse.Success || userResult.ApiReponse.Data == null)
                 {
                     return new Response<bool>().Failure(false, message: "Usuário não encontrado.", statusCode: HttpStatusCode.NotFound);
