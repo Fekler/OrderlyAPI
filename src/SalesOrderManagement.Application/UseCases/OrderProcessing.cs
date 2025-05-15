@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using SalesOrderManagement.Application.Dtos.Entities.Order;
 using SalesOrderManagement.Application.Dtos.Entities.OrderItem;
+using SalesOrderManagement.Application.Dtos.Entities.Product;
 using SalesOrderManagement.Application.Interfaces.Business;
 using SalesOrderManagement.Application.Interfaces.UseCases;
 using SalesOrderManagement.Domain.Interfaces.Repositories;
@@ -145,7 +146,6 @@ namespace SalesOrderManagement.Application.UseCases
                 order.Status = orderStatus;
                 order.ActionedByUserUuid = user.UUID;
                 order.ActionedAt = DateTime.UtcNow;
-                await _orderBusiness.Update(order.Adapt<UpdateOrderDto>());
                 if (orderStatus == OrderStatus.Approved)
                 {
                     foreach (var item in order.OrderItems)
@@ -156,12 +156,17 @@ namespace SalesOrderManagement.Application.UseCases
                             return new Response<bool>().Failure(false, message: "Item do pedido não encontrado.", statusCode: HttpStatusCode.NotFound);
                         }
                         var orderItem = orderItemResult.ApiReponse.Data;
-                        
+                        if (orderItem.Product.Quantity < item.Quantity)
+                        {
+                            return new Response<bool>().Failure(false, message: $"Produto {orderItem.Product.Name} não tem estoque suficiente.", statusCode: HttpStatusCode.BadRequest);
+                        }
                         orderItem.Product.Quantity -= item.Quantity;
-
+                        await _productBusiness.Update(orderItem.Product.Adapt<UpdateProductDto>());
                         await _orderItemBusiness.Update(orderItem.Adapt<UpdateOrderItemDto>());
                     }
                 }
+                await _orderBusiness.Update(order.Adapt<UpdateOrderDto>());
+
                 return new Response<bool>().Sucess(true, message: "Status do pedido atualizado com sucesso.", statusCode: HttpStatusCode.OK);
             }
             catch (Exception ex)
