@@ -41,7 +41,8 @@ namespace SalesOrderManagement.Application.UseCases
                     return new Response<Guid>().Failure(default, message: "Erro ao recuperar a entidade do pedido.", statusCode: HttpStatusCode.InternalServerError);
                 }
                 var orderEntity = orderEntityResult.ApiReponse.Data;
-                await _orderBusiness.Update(orderEntity.Adapt<UpdateOrderDto>());
+
+                //await _orderBusiness.Update(orderEntity.Adapt<UpdateOrderDto>());
 
                 decimal totalOrderAmount = 0;
                 var createdOrderItemsUuids = new List<Guid>();
@@ -73,17 +74,15 @@ namespace SalesOrderManagement.Application.UseCases
                         return new Response<Guid>().Failure(default, message: "Erro ao recuperar a entidade do item do pedido.", statusCode: HttpStatusCode.InternalServerError);
                     }
                     var orderItemEntity = orderItemEntityResult.ApiReponse.Data;
-                    orderItemEntity.OrderId = orderEntity.UUID;
-                    orderItemEntity.UnitPrice = product.Price;
-                    orderItemEntity.TotalPrice = orderItemEntity.UnitPrice * orderItemEntity.Quantity;
-                    await _orderItemBusiness.Update(orderItemEntity.Adapt<UpdateOrderItemDto>());
 
                     totalOrderAmount += orderItemEntity.TotalPrice;
                     createdOrderItemsUuids.Add(orderItemUuid);
                 }
+                 var orderEntityResultWithItemsResponse = await _orderBusiness.GetEntity(orderEntityResult.ApiReponse.Data.UUID);
 
-                orderEntity.TotalAmount = totalOrderAmount;
-                await _orderBusiness.Update(orderEntity.Adapt<UpdateOrderDto>());
+                var orderEntityResultWithItems = orderEntityResultWithItemsResponse.ApiReponse.Data;
+                orderEntityResultWithItems?.CalculateTotalAmount();
+                await _orderBusiness.Update(orderEntityResultWithItems.Adapt<UpdateOrderDto>());
 
                 return new Response<Guid>().Sucess(orderUuid, message: "Pedido criado com sucesso.", statusCode: HttpStatusCode.Created);
             }

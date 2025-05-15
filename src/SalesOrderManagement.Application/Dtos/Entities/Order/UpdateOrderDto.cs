@@ -24,6 +24,7 @@ namespace SalesOrderManagement.Application.Dtos.Entities.Order
         [MaxLength(Const.ADDRESS_MAX_LENGTH, ErrorMessage = "O endereço de cobrança não pode exceder 255 caracteres.")]
         public string BillingAddress { get; set; }
 
+        public decimal? TotalAmount { get; set; }
         public PaymentMethod? PaymentMethod { get; set; }
 
         public OrderStatus? Status { get; set; }

@@ -37,6 +37,7 @@ namespace SalesOrderManagement.API.Infra.Repositories
         {
             return await _dbSet
                 .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
                 .ToListAsync();
         }
     }

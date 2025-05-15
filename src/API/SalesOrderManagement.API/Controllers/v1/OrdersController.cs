@@ -33,6 +33,7 @@ namespace SalesOrderManagement.API.Controllers.v1
                 return Unauthorized(Error.UNAUTHORIZED);
             }
             createOrderRequest.CreateByUserUuid = createdByUserUuid;
+            
             var response = await _orderProcessing.CreateOrder(createOrderRequest);
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }

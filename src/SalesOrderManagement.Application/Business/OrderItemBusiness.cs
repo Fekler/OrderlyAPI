@@ -14,7 +14,7 @@ namespace SalesOrderManagement.Application.Business
     public class OrderItemBusiness(IOrderItemRepository orderItemRepository, IProductRepository productRepository, ILogger<OrderItemBusiness> logger) : IOrderItemBusiness
     {
         private readonly IOrderItemRepository _orderItemRepository = orderItemRepository;
-        private readonly IProductRepository _productRepository = productRepository; 
+        private readonly IProductRepository _productRepository = productRepository;
         private readonly ILogger<OrderItemBusiness> _logger = logger;
 
         public async Task<Response<Guid>> Add(CreateOrderItemDto createOrderItemDto)
@@ -26,9 +26,12 @@ namespace SalesOrderManagement.Application.Business
                 {
                     return new Response<Guid>().Failure(default, message: Error.PRODUCT_NOT_FOUND, statusCode: HttpStatusCode.NotFound);
                 }
-
+                if (!createOrderItemDto.OrderId.HasValue || createOrderItemDto.OrderId == Guid.Empty)
+                {
+                    return new Response<Guid>().Failure(default, message: "OrderId é obrigatório.", statusCode: HttpStatusCode.BadRequest);
+                }
                 var orderItem = createOrderItemDto.Adapt<OrderItem>();
-                orderItem.UnitPrice = product.Price; 
+                orderItem.UnitPrice = product.Price;
                 orderItem.CalculateTotalPrice();
                 orderItem.Validate();
 
