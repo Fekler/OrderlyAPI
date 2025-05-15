@@ -7,12 +7,11 @@ namespace SalesOrderManagement.API.Controllers.v1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [Authorize] 
     public class DashboardController(IDashboard dashboardUseCase) : ControllerBase
     {
         private readonly IDashboard _dashboardUseCase = dashboardUseCase;
-
         [HttpGet("sales-summary")]
+        [Authorize("Admin")]
         public async Task<IActionResult> GetSalesSummary()
         {
             var response = await _dashboardUseCase.GetSalesSummary();
@@ -20,6 +19,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         }
 
         [HttpGet("pending-orders-count")]
+        [Authorize("Admin")]
         public async Task<IActionResult> GetPendingOrdersCount()
         {
             var response = await _dashboardUseCase.GetPendingOrdersCount();
@@ -27,6 +27,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         }
 
         [HttpGet("most-active-customers")]
+        [Authorize("Admin")]
         public async Task<IActionResult> GetMostActiveCustomers()
         {
             var response = await _dashboardUseCase.GetMostActiveCustomers();
