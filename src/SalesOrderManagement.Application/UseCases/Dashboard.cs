@@ -86,7 +86,7 @@ namespace SalesOrderManagement.Application.UseCases
         {
             try
             {
-                var allOrdersResponse = await _orderBusiness.GetAllWithItemsAsync();
+                var allOrdersResponse = await _orderBusiness.GetOrdersByStatus(OrderStatus.Approved.ToString());
                 if (!allOrdersResponse.ApiReponse.Success || allOrdersResponse.ApiReponse.Data == null)
                 {
                     _logger.LogError("Erro ao obter todos os pedidos para o resumo de vendas.");
