@@ -106,8 +106,8 @@ namespace SalesOrderManagement.Application.UseCases
 
                 return user.ApiReponse.Data.UserRole switch
                 {
-                    UserRole.Admin => await _orderBusiness.GetAll(),
-                    UserRole.Seller => await _orderBusiness.GetAll(),
+                    UserRole.Admin => await _orderBusiness.GetAllWithItemsAsync(),
+                    UserRole.Seller => await _orderBusiness.GetAllWithItemsAsync(),
                     UserRole.Client => await _orderBusiness.GetOrdersByUserId(userUuid),
                     _ => new Response<IEnumerable<OrderDto>>().Failure(default, message: "Função de usuário inválida.", statusCode: HttpStatusCode.BadRequest),
                 };
