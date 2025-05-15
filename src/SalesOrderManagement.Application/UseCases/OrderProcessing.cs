@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.Extensions.Logging;
 using SalesOrderManagement.Application.Dtos.Entities.Order;
 using SalesOrderManagement.Application.Dtos.Entities.OrderItem;
 using SalesOrderManagement.Application.Dtos.Entities.Product;
@@ -17,13 +18,15 @@ namespace SalesOrderManagement.Application.UseCases
         private readonly IProductBusiness _productBusiness;
         private readonly IOrderItemBusiness _orderItemBusiness;
         private readonly IUserBusiness _userBusiness;
+        private readonly ILogger<OrderProcessing> _logger;
 
-        public OrderProcessing(IOrderBusiness orderBusiness, IProductBusiness productBusiness, IOrderItemBusiness orderItemBusiness, IUserBusiness userBusiness)
+        public OrderProcessing(IOrderBusiness orderBusiness, IProductBusiness productBusiness, IOrderItemBusiness orderItemBusiness, IUserBusiness userBusiness, ILogger<OrderProcessing> logger)
         {
             _orderBusiness = orderBusiness;
             _productBusiness = productBusiness;
             _orderItemBusiness = orderItemBusiness;
             _userBusiness = userBusiness;
+            _logger = logger;
         }
 
         public async Task<Response<Guid>> CreateOrder(CreateOrderDto createOrderDto)
@@ -158,6 +161,9 @@ namespace SalesOrderManagement.Application.UseCases
                         var orderItem = orderItemResult.ApiReponse.Data;
                         if (orderItem.Product.Quantity < item.Quantity)
                         {
+                            order.Status = OrderStatus.InsuficientProducts;
+                            await _orderBusiness.Update(order.Adapt<UpdateOrderDto>());
+                            _logger.LogWarning($"Produto {orderItem.Product.Name} não tem estoque suficiente. Pedido: {order.UUID}, Item: {orderItem.UUID}");
                             return new Response<bool>().Failure(false, message: $"Produto {orderItem.Product.Name} não tem estoque suficiente.", statusCode: HttpStatusCode.BadRequest);
                         }
                         orderItem.Product.Quantity -= item.Quantity;
