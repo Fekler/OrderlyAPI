@@ -78,7 +78,7 @@ namespace SalesOrderManagement.Application.UseCases
                     totalOrderAmount += orderItemEntity.TotalPrice;
                     createdOrderItemsUuids.Add(orderItemUuid);
                 }
-                 var orderEntityResultWithItemsResponse = await _orderBusiness.GetEntity(orderEntityResult.ApiReponse.Data.UUID);
+                var orderEntityResultWithItemsResponse = await _orderBusiness.GetEntity(orderEntityResult.ApiReponse.Data.UUID);
 
                 var orderEntityResultWithItems = orderEntityResultWithItemsResponse.ApiReponse.Data;
                 orderEntityResultWithItems?.CalculateTotalAmount();
@@ -129,7 +129,7 @@ namespace SalesOrderManagement.Application.UseCases
                 }
                 var order = orderResult.ApiReponse.Data;
                 var userResult = await _userBusiness.GetEntity(userUuid);
-                if(orderResult.ApiReponse.Data.Status == OrderStatus.Approved)
+                if (orderResult.ApiReponse.Data.Status == OrderStatus.Approved)
                 {
                     return new Response<bool>().Failure(false, message: "Pedido já foi aprovado.", statusCode: HttpStatusCode.BadRequest);
                 }
@@ -156,7 +156,8 @@ namespace SalesOrderManagement.Application.UseCases
                             return new Response<bool>().Failure(false, message: "Item do pedido não encontrado.", statusCode: HttpStatusCode.NotFound);
                         }
                         var orderItem = orderItemResult.ApiReponse.Data;
-                            orderItem.Quantity -= item.Quantity;
+                        
+                        orderItem.Product.Quantity -= item.Quantity;
 
                         await _orderItemBusiness.Update(orderItem.Adapt<UpdateOrderItemDto>());
                     }
