@@ -48,7 +48,12 @@ namespace SalesOrderManagement.Application.Profiles
             #endregion
 
             #region Order
-            TypeAdapterConfig<Order, OrderDto>.NewConfig().TwoWays();
+            TypeAdapterConfig<Order, OrderDto>.NewConfig()
+                .Map(dest => dest.CreateByUserName, src=> src.CreateByUser.FullName)
+                .Map(dest => dest.CreateByUserEmail, src => src.CreateByUser.Email);
+
+            TypeAdapterConfig<OrderDto, Order>.NewConfig()
+                .Ignore(dest => dest.CreateByUser);
 
             TypeAdapterConfig<CreateOrderDto, Order>.NewConfig()
                 .Map(dest => dest.OrderDate, src => DateTime.UtcNow)
