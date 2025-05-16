@@ -12,7 +12,7 @@ using SalesOrderManagement.API.Infra.Context;
 namespace SalesOrderManagement.API.Infra.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250511011423_InitialCreate")]
+    [Migration("20250516132115_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -124,6 +124,10 @@ namespace SalesOrderManagement.API.Infra.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(18, 2)

@@ -7,6 +7,8 @@
     <UserSecretsId>a358994a-6cb8-471c-a4c7-468346106e27</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..\..</DockerfileContext>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+
   </PropertyGroup>
 
   <ItemGroup>

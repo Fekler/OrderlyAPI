@@ -18,7 +18,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         private readonly IOrderProcessing _orderProcessing = orderProcessing;
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Client")]
+        [Authorize(Roles = "Client")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto createOrderRequest)
         {
             if (!ModelState.IsValid)
