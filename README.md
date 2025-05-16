@@ -26,6 +26,7 @@ API desenvolvida com o objetivo de gerenciar pedidos de clientes, produtos, usu�
 - **Docker**
 - **PostgresSQL**
 - **GitHub Actions (CI/CD)**
+- **Configuração Nginx**
 
 ---
 
