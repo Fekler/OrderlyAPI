@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TOKEN_JWT_SECRET: ${{ secrets.TOKEN_JWT_SECRET }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
