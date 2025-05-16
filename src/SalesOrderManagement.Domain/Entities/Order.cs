@@ -50,10 +50,10 @@ namespace SalesOrderManagement.Domain.Entities
                 .When(CreateByUserUuid == Guid.Empty, "CreateByUserUuid is required.")
                 .ThrowExceptionIfExists();
 
-            foreach (var item in OrderItems)
-            {
-                item?.Validate();
-            }
+            //foreach (var item in OrderItems)
+            //{
+            //    item?.Validate();
+            //}
         }
     }
 }

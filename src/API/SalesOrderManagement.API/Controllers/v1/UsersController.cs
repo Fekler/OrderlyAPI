@@ -14,7 +14,7 @@ namespace SalesOrderManagement.API.Controllers.v1
         private readonly IUserBusiness _userBusiness = userBusiness;
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Add([FromBody] CreateUserDto createUserDto)
         {
             if (!ModelState.IsValid)
@@ -55,6 +55,14 @@ namespace SalesOrderManagement.API.Controllers.v1
         public async Task<IActionResult> Get(Guid guid)
         {
             var response = await _userBusiness.GetDto(guid);
+            return StatusCode((int)response.StatusCode, response.ApiReponse);
+        }
+
+        [HttpGet()]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAll()
+        {
+            var response = await _userBusiness.GetAll();
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }
 

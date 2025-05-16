@@ -21,8 +21,9 @@ namespace SalesOrderManagement.Application.Business
             try
             {
                 var order = createOrderDto.Adapt<Order>();
+                order.OrderItems.Clear();
                 order.Validate();
-
+                order.GenerateOrderNumber();
                 await _orderRepository.Add(order);
                 _logger.LogInformation($"Pedido criado com UUID: {order.UUID} e número: {order.OrderNumber}");
                 return new Response<Guid>().Sucess(order.UUID, message: Const.CREATE_SUCCESS, statusCode: HttpStatusCode.Created);
@@ -111,6 +112,7 @@ namespace SalesOrderManagement.Application.Business
             {
                 var orders = await _orderRepository.GetAllWithItemsAsync();
                 var orderDtos = orders.Adapt<IEnumerable<OrderDto>>();
+                orderDtos = orderDtos.OrderByDescending(o => o.Status == Enums.OrderStatus.Pending).ThenBy(o=> o.OrderDate);
                 return new Response<IEnumerable<OrderDto>>().Sucess(orderDtos, statusCode: HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -143,7 +145,7 @@ namespace SalesOrderManagement.Application.Business
         {
             try
             {
-                var order = await _orderRepository.Get(guid);
+                var order = await _orderRepository.GetOrderWithOrdemItems(guid);
                 if (order == null)
                 {
                     return new Response<Order>().Failure(default, message: Error.ORDER_NOT_FOUND, statusCode: HttpStatusCode.NotFound);
@@ -161,17 +163,17 @@ namespace SalesOrderManagement.Application.Business
         {
             try
             {
-                var existingOrder = await _orderRepository.Get(updateOrderDto.UUID);
+                var existingOrder = await _orderRepository.GetOrderWithOrdemItems(updateOrderDto.UUID);
                 if (existingOrder == null)
                 {
                     return new Response<bool>().Failure(false, message: Error.ORDER_NOT_FOUND, statusCode: HttpStatusCode.NotFound);
                 }
 
-                updateOrderDto.Adapt(existingOrder);
-                existingOrder.UpdateAt = DateTime.UtcNow;
-                existingOrder.Validate();
+                var entity =  updateOrderDto.Adapt(existingOrder);
+                entity.UpdateAt = DateTime.UtcNow;
+                entity.Validate();
 
-                var result = await _orderRepository.Update(existingOrder);
+                var result = await _orderRepository.Update(entity);
                 if (result)
                 {
                     _logger.LogInformation($"Pedido com UUID: {updateOrderDto.UUID} atualizado com sucesso.");

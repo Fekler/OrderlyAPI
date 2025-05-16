@@ -11,19 +11,19 @@
         public enum OrderStatus
         {
             Pending,
+            Approved,
+            Cancelled,
             Processing,
             Shipped,
             Delivered,
-            Cancelled,
-            Approved
+            InsuficientProducts
         }
         public enum PaymentMethod
         {
             CreditCard,
             DebitCard,
-            BankTransfer,
-            Cash,
-            Pix
+            Pix,
+            Cash
         }
 
     }

@@ -33,6 +33,7 @@ namespace SalesOrderManagement.Application.Profiles
             TypeAdapterConfig<Product, ProductDto>.NewConfig().TwoWays();
 
             TypeAdapterConfig<CreateProductDto, Product>.NewConfig()
+
                 .Map(dest => dest.Name, src => src.Name.Trim())
                 .Map(dest => dest.Description, src => src.Description.Trim())
                 .Map(dest => dest.IsActive, src => true)
@@ -47,7 +48,12 @@ namespace SalesOrderManagement.Application.Profiles
             #endregion
 
             #region Order
-            TypeAdapterConfig<Order, OrderDto>.NewConfig().TwoWays();
+            TypeAdapterConfig<Order, OrderDto>.NewConfig()
+                .Map(dest => dest.CreateByUserName, src=> src.CreateByUser.FullName)
+                .Map(dest => dest.CreateByUserEmail, src => src.CreateByUser.Email);
+
+            TypeAdapterConfig<OrderDto, Order>.NewConfig()
+                .Ignore(dest => dest.CreateByUser);
 
             TypeAdapterConfig<CreateOrderDto, Order>.NewConfig()
                 .Map(dest => dest.OrderDate, src => DateTime.UtcNow)
@@ -61,13 +67,17 @@ namespace SalesOrderManagement.Application.Profiles
             TypeAdapterConfig<UpdateOrderDto, Order>.NewConfig()
                 .Ignore(dest => dest.Id)
                 .Ignore(dest => dest.CreateAt)
+                .Ignore(dest => dest.OrderItems) 
                 .Map(dest => dest.UpdateAt, src => DateTime.UtcNow)
                 .Map(dest => dest.ShippingAddress, src => src.ShippingAddress.Trim())
                 .Map(dest => dest.BillingAddress, src => src.BillingAddress.Trim());
             #endregion
 
             #region OrderItem
-            TypeAdapterConfig<OrderItem, OrderItemDto>.NewConfig().TwoWays();
+            TypeAdapterConfig<OrderItem, OrderItemDto>.NewConfig()
+                .Map(dest => dest.ProductName, src => src.Product.Name);
+
+            TypeAdapterConfig<OrderItemDto, OrderItem>.NewConfig().Ignore(dest => dest.Product); 
 
             TypeAdapterConfig<CreateOrderItemDto, OrderItem>.NewConfig()
                 .Map(dest => dest.CreateAt, src => DateTime.UtcNow)

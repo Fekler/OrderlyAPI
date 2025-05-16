@@ -1,20 +1,21 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SalesOrderManagement.Application.Dtos.Dashboard;
 using SalesOrderManagement.Application.Dtos.Entities.Order;
 using SalesOrderManagement.Application.Interfaces.Business;
+using SalesOrderManagement.Application.Interfaces.UseCases;
 using SalesOrderManagement.Domain.Errors;
 using System.Security.Claims;
+using static SalesOrderManagement.Domain.Entities._bases.Enums;
 
 namespace SalesOrderManagement.API.Controllers.v1
 {
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class OrdersController(IOrderBusiness orderBusiness, OrderProcessing orderProcessing) : ControllerBase
+    public class OrdersController(IOrderBusiness orderBusiness, IOrderProcessing orderProcessing) : ControllerBase
     {
         private readonly IOrderBusiness _orderBusiness = orderBusiness;
-        private readonly OrderProcessing _orderProcessing = orderProcessing;
+        private readonly IOrderProcessing _orderProcessing = orderProcessing;
 
         [HttpPost]
         [Authorize(Roles = "Admin,Client")]
@@ -32,6 +33,7 @@ namespace SalesOrderManagement.API.Controllers.v1
                 return Unauthorized(Error.UNAUTHORIZED);
             }
             createOrderRequest.CreateByUserUuid = createdByUserUuid;
+            
             var response = await _orderProcessing.CreateOrder(createOrderRequest);
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }
@@ -46,21 +48,27 @@ namespace SalesOrderManagement.API.Controllers.v1
 
         }
 
-        [HttpGet("user/{userId}")]
-        [Authorize(Roles = "Admin,Client")]
-        public async Task<IActionResult> GetOrdersByUserId(Guid userId)
+        [HttpGet()]
+        [Authorize]
+        public async Task<IActionResult> GetOrdersByLoggedUserId()
         {
-            var response = await _orderBusiness.GetOrdersByUserId(userId);
+            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized(Error.UNAUTHORIZED);
+            }
+            var response = await _orderProcessing.GetAllByLoggedUser(userId);
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }
 
         [HttpGet("status/{status}")]
-        [Authorize(Roles = "Admin,Client")]
+        [Authorize(Roles = "Admin,Seller")]
         public async Task<IActionResult> GetOrdersByStatus(string status)
         {
             var response = await _orderBusiness.GetOrdersByStatus(status);
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }
+
 
         [HttpGet("date-range")]
         [Authorize(Roles = "Admin,Client")]
@@ -74,7 +82,7 @@ namespace SalesOrderManagement.API.Controllers.v1
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }
 
-        [HttpGet]
+        [HttpGet("GetAllDetailed")]
         [Authorize(Roles = "Admin,Client")]
         public async Task<IActionResult> GetAllOrdersWithItems()
         {
@@ -105,6 +113,24 @@ namespace SalesOrderManagement.API.Controllers.v1
         public async Task<IActionResult> DeleteOrder(Guid uuid)
         {
             var response = await _orderBusiness.Delete(uuid);
+            return StatusCode((int)response.StatusCode, response.ApiReponse);
+        }
+
+
+        [HttpPost("manager-order")]
+        [Authorize(Roles = "Admin,Seller")]
+        public async Task<IActionResult> ManagerOrder(Guid orderUuid, OrderStatus status)
+        {
+
+
+            var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userUuid))
+            {
+                return Unauthorized(Error.UNAUTHORIZED);
+            }
+            
+            var response = await _orderProcessing.ActionOrder(orderUuid,userUuid, status);
             return StatusCode((int)response.StatusCode, response.ApiReponse);
         }
     }

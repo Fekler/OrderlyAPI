@@ -11,16 +11,10 @@ using System.Net;
 
 namespace SalesOrderManagement.Application.Business
 {
-    public class ProductBusiness : IProductBusiness
+    public class ProductBusiness(IProductRepository productRepository, ILogger<ProductBusiness> logger) : IProductBusiness
     {
-        private readonly IProductRepository _productRepository;
-        private readonly ILogger<ProductBusiness> _logger;
-
-        public ProductBusiness(IProductRepository productRepository, ILogger<ProductBusiness> logger)
-        {
-            _productRepository = productRepository;
-            _logger = logger;
-        }
+        private readonly IProductRepository _productRepository = productRepository;
+        private readonly ILogger<ProductBusiness> _logger = logger;
 
         public async Task<Response<Guid>> Add(CreateProductDto createProductDto)
         {
@@ -109,19 +103,19 @@ namespace SalesOrderManagement.Application.Business
             }
         }
 
-        public Task<Response<IEnumerable<ProductDto>>> GetAll()
+        public async Task<Response<IEnumerable<ProductDto>>> GetAll()
         {
-            var products = _productRepository.GetAll();
+            var products = await _productRepository.GetAll();
             var productDtos = products.Adapt<IEnumerable<ProductDto>>();
-            return Task.FromResult(new Response<IEnumerable<ProductDto>>().Sucess(productDtos, statusCode: HttpStatusCode.OK));
+            return new Response<IEnumerable<ProductDto>>().Sucess(productDtos, statusCode: HttpStatusCode.OK);
 
         }
 
-        public Task<Response<IEnumerable<ProductDto>>> GetAllByCategory(string category)
+        public async Task<Response<IEnumerable<ProductDto>>> GetAllByCategory(string category)
         {
-            var products = _productRepository.GetAllByCategory(category);
+            var products = await _productRepository.GetAllByCategory(category);
             var productDtos = products.Adapt<IEnumerable<ProductDto>>();
-            return Task.FromResult(new Response<IEnumerable<ProductDto>>().Sucess(productDtos, statusCode: HttpStatusCode.OK));
+            return new Response<IEnumerable<ProductDto>>().Sucess(productDtos, statusCode: HttpStatusCode.OK);
         }
 
         public async Task<Response<ProductDto>> GetDto(Guid guid)

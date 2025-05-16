@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using SalesOrderManagement.API.Infra.Context;
 using SalesOrderManagement.API.Infra.Repositories;
 using SalesOrderManagement.Application.Business;
-using SalesOrderManagement.Application.Dtos.Dashboard;
 using SalesOrderManagement.Application.Interfaces;
 using SalesOrderManagement.Application.Interfaces.Business;
 using SalesOrderManagement.Application.Interfaces.UseCases;

@@ -14,6 +14,8 @@ namespace SalesOrderManagement.Application.Dtos.Entities.Order
         public PaymentMethod PaymentMethod { get; set; }
         public OrderStatus Status { get; set; }
         public Guid CreateByUserUuid { get; set; }
+        public string CreateByUserName { get; set; }
+        public string CreateByUserEmail { get; set; }
         public Guid? ActionedByUserUuid { get; set; }
         public DateTime? ActionedAt { get; set; }
         public ICollection<OrderItemDto> OrderItems { get; set; }
