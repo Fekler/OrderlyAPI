@@ -7,7 +7,7 @@ API desenvolvida com o objetivo de gerenciar pedidos de clientes, produtos, usu�
 **📖 https://sales-dev-api.fekler.tec.br/swagger/index.html** - Documentação
 
 
-A Api estão documentadas utilizando o padrão OpenAPI e Swagger para exibição visual.
+A Api esta documentada utilizando o padrão OpenAPI e Swagger para exibição visual.
 
 ---
 
