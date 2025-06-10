@@ -4,13 +4,8 @@
 API desenvolvida com o objetivo de gerenciar pedidos de clientes, produtos, usuários e fornecer visão gerencial sobre vendas.
 
 📡 A API está publicada em:  
-**🔗 https://sales-dev-api.fekler.tec.br/api/** - Ambiente de desenvolvimento(branch dev)
-
 **📖 https://sales-dev-api.fekler.tec.br/swagger/index.html** - Documentação
 
-**🔗 https://salesmanagement-api.fekler.tec.br/api/** - Ambiente de produção(branch master)
-
-**📖 https://salesmanagement-api.fekler.tec.br/swagger/index.html** - Documentação
 
   As Apis estão documentadas utilizando o padrão OpenAPI e Swagger para exibição visual.
 ---
