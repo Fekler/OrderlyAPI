@@ -1,5 +1,5 @@
 
-# Sales Order Management API
+# Orderly API
 
 API desenvolvida com o objetivo de gerenciar pedidos de clientes, produtos, usuários e fornecer visão gerencial sobre vendas.
 
